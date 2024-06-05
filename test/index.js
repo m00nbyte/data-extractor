@@ -37,9 +37,6 @@ describe('test', () => {
         assert.strictEqual(extractedKeys.id === 'bc04be50', true);
         assert.strictEqual(extractedKeys.test === 'something', true);
         assert.strictEqual(extractedKeys.arr === 'hello', true);
-
-        // key not found
-        assert.strictEqual(extractedKeys.almeria === 'not-found', true);
     });
 
     it('should extract data with index appended', () => {
@@ -49,7 +46,7 @@ describe('test', () => {
         assert.strictEqual(extractedKeys.test5 === true, true);
     });
 
-    it('should not extract data', () => {
-        assert.strictEqual(extractedKeys.almeria === 'not-found', true);
+    it('should return default value', () => {
+        assert.strictEqual(extractedKeys.almeria === defaultValue, true);
     });
 });
