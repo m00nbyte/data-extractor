@@ -1,6 +1,6 @@
 {
     "name": "@m00nbyte/data-extractor",
-    "version": "1.0.3",
+    "version": "1.0.0",
     "description": "Effortlessly extract multiple keys from deeply nested structures within an object, resulting in a reduced, flattened output",
     "author": "m00nbyte <office@moonbyte.at>",
     "keywords": [
