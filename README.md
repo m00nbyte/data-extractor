@@ -20,7 +20,7 @@ yarn add -D @m00nbyte/data-extractor
 ```js
 import extractData from '@m00nbyte/data-extractor';
 
-const sourceObject = {
+const sourceObj = {
     level1: {
         '- quoted key -': 'yes',
         level2: {
@@ -35,21 +35,20 @@ const sourceObject = {
     }
 };
 
-const keysToExtract = [
-    'level1.- quoted key -',
-    'level1.level2.id',
-    'level1.level2.level3.test',
-    'level1.level2.level3.level4.arr[0]',
-    'level1.level2.level3.level4.arr[1][0]',
-    'level1.level2.level3.level4.arr[1][1].test',
-    'level1.level2.level3.level4.level5.almeria'
-];
+const pathMap = {
+    quoted: 'level1.- quoted key -',
+    id: 'level1.level2.id',
+    test: 'level1.level2.level3.test',
+    arr_0: 'level1.level2.level3.level4.arr[0]',
+    arr_1_0: 'level1.level2.level3.level4.arr[1][0]',
+    test2: 'level1.level2.level3.level4.arr[1][1].test',
+    almeria: 'level1.level2.level3.level4.level5.almeria'
+};
 
 // optional
 const defaultValue = 'not-found';
 
-const extractedKeys = extractData(sourceObject, keysToExtract, defaultValue);
-console.log(extractedKeys);
+const extractedKeys = extractData(sourceObj, pathMap, defaultValue);
 
 if (extractedKeys.id && extractedKeys.test) {
     // do something
@@ -60,21 +59,20 @@ if (extractedKeys.id && extractedKeys.test) {
 
 ### `sourceObject`
 
-Type: `Object`
-Default: `{}`<br />
+Type: `Object`<br />
 
-An object from which a list of keys should be extracted.
+The source object to extract data from.
 
-### `keysToExtract`
+### `pathMap`
 
-Type: `Array[...String]`
-Default: `[]`<br />
+Type: `Object`<br />
 
-An array of strings representing the paths to the keys that should be extracted from the source object.
+An object mapping property names to their paths in the source object.
 
 ### `defaultValue`
 
-Type: `Boolean|String|Number|Object|Array|null|undefined`
+Type: `String|undefined`
+
 Default: `undefined`<br />
 
 An optional default value to return if a key does not exist in the source object.

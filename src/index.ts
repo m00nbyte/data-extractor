@@ -1,48 +1,60 @@
 /**
- * Extracts multiple keys from any depth within an object and returns them in a flattened structure.
+ * Extracts data from an object based on provided paths.
  *
- * @param {Record<string, any>} obj - The source object from which keys will be extracted.
- * @param {string[]} arr - An array of keys to be extracted from the source object.
- * @param {*} [def=undefined] - The default value to return if a key is not found in the source object.
- * @returns {Record<string, any>} - An object containing the extracted keys with their corresponding values.
+ * @param {object} sourceObj - The source object to extract data from.
+ * @param {Record<string, string>} pathMap - An object mapping property names to their paths in the source object.
+ * @param {string | undefined} [defaultValue=undefined] - An optional default value to return if a key does not exist in the source object.
+ * @returns {Record<string, unknown>} - An object containing the extracted data.
+ * @throws Will throw an error if the obj is not an object or if the paths are empty.
  */
-const extractData = (obj: Record<string, any> = {}, arr: string[] = [], def: any = undefined): Record<string, any> => {
-    // Check if obj is empty or not an object
-    if (typeof obj !== 'object' || Object.keys(obj).length === 0) {
-        throw new Error('Invalid source object. Please provide a non-empty object.');
+const extractData = (
+    sourceObj: object,
+    pathMap: Record<string, string>,
+    defaultValue: string | undefined = undefined
+): Record<string, unknown> => {
+    // Check if source object is a non-null object and not an array
+    if (typeof sourceObj !== 'object' || Object.keys(sourceObj).length === 0 || Array.isArray(sourceObj)) {
+        throw new Error('Source object must be a non-null object.');
     }
 
-    // Check if arr is not an array or empty
-    if (!Array.isArray(arr) || arr.length === 0) {
-        throw new Error('Invalid array of key. Please provide a non-empty array.');
+    // Check if paths is non-empty
+    if (typeof pathMap !== 'object' || Object.keys(pathMap).length === 0 || Array.isArray(pathMap)) {
+        throw new Error('Path map object must be non-empty.');
     }
 
-    // Remove duplicate entries
-    const set = [...new Set(arr)];
+    // Check if paths is non-empty
+    if (typeof defaultValue !== 'undefined' && typeof defaultValue !== 'string') {
+        throw new Error('Default value must be a string.');
+    }
 
-    // Process unique keys
-    const res: Record<string, any> = set.reduce((keys: Record<string, any>, path) => {
-        // Split levels, supporting array indexes
-        const levels = path.split(/[\.\[\]\'\"]/).filter((p) => p);
+    // Process the source object
+    return Object.fromEntries(
+        Object.entries(pathMap).map(([mappedKey, sourcePath]) => {
+            let current: unknown = sourceObj;
 
-        // Strip path and select the last level
-        let key = levels.slice(-1)?.[0] as string;
+            // Split the path into keys and filter out empty keys
+            const keys = sourcePath.split(/\.|\[|\]\./).filter((key) => key);
 
-        // If the key is an index, get the parent key
-        key = levels.filter((item) => isNaN(parseInt(item, 10)))?.slice(-1)?.[0] || key;
+            // Traverse the object using the keys
+            for (let key of keys) {
+                if (typeof current !== 'object' || current === null) {
+                    current = undefined;
+                    break;
+                }
 
-        // If the key already exists, append an index
-        if (Object.keys(keys).includes(key)) key += Object.keys(keys).length;
+                current = key.includes(']')
+                    ? Array.isArray(current)
+                        ? current[parseInt(key.replace(']', ''), 10)]
+                        : undefined
+                    : (current as Record<string, unknown>)[key];
 
-        // Extract the value corresponding to the key
-        keys[key] = levels.reduce((o, l) => (o && o[l]) || def, obj);
+                // Break if current becomes undefined
+                if (current === undefined) break;
+            }
 
-        // Merge with keys
-        return keys;
-    }, {});
-
-    // Return the result
-    return res;
+            return [mappedKey, current || defaultValue];
+        })
+    );
 };
 
 export default extractData;
