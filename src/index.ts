@@ -1,5 +1,5 @@
 /**
- * Extracts data from an object based on provided paths.
+ * Effortlessly extract multiple keys from deeply nested structures within an object, resulting in a reduced, flattened output.
  *
  * @param {object} sourceObj - The source object to extract data from.
  * @param {Record<string, string>} pathMap - An object mapping property names to their paths in the source object.
@@ -22,7 +22,7 @@ const extractData = (
         throw new Error('Path map object must be non-empty.');
     }
 
-    // Check if paths is non-empty
+    // Check if default value is a string if provided
     if (typeof defaultValue !== 'undefined' && typeof defaultValue !== 'string') {
         throw new Error('Default value must be a string.');
     }
